@@ -1,17 +1,12 @@
 import { CubeGeometry, MeshBasicMaterial, Mesh } from 'three';
-import { v1 } from 'uuid';
 
-export default class Cube {
+import Geometry from './geometry';
+
+export default class Cube extends Geometry {
   constructor(name) {
-    if (name) this.name = name;
-    else this.name = v1();
-    this.geometry = new CubeGeometry(2, 3, 4);
+    super(name);
+    this.geometry = new CubeGeometry(10, 10, 10);
     this.material = new MeshBasicMaterial({ color: 0x00ff00 });
     this.instance = new Mesh(this.geometry, this.material);
-    this.animate = () => {};
-  }
-
-  doAnimate() {
-    this.animate(this.instance);
   }
 }
