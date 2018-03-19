@@ -1,4 +1,5 @@
 import { WebGLRenderer, PerspectiveCamera, Scene } from 'three';
+import Stats from 'stats.js';
 import { v1 } from 'uuid';
 
 export default class Renderer {
@@ -11,13 +12,17 @@ export default class Renderer {
 
     this.objectMap = {};
     this.scene = new Scene();
-    this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.camera = new PerspectiveCamera(100, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.camera.position.z = 5;
 
     this.renderer = new WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.container.appendChild(this.renderer.domElement);
+    this.renderer.setClearColor(0xFFFFFF, 1.0);
     window.addEventListener('resize', () => this.onResize());
+    this.stats = new Stats();
+    document.body.appendChild(this.stats.dom);
   }
 
   onResize() {
@@ -26,8 +31,8 @@ export default class Renderer {
 
   add(object) {
     if (object.name) {
-      this.objectMap[object.name] = object.instance;
-      this.scene(object.instance);
+      this.objectMap[object.name] = object;
+      this.scene.add(object.instance);
       return null;
     }
     const name = v1();
@@ -44,9 +49,23 @@ export default class Renderer {
     delete this.objectMap[name];
   }
 
+  animate() {
+    // for(let name in this.objectMap) {
+    //   this.objectMap[name].doAnimate();
+    // }
+    Object.keys(this.objectMap).forEach((name) => {
+      this.objectMap[name].doAnimate();
+    });
+  }
+
   go() {
-    requestAnimationFrame(() => this.render());
-    this.animate();
-    this.renderer.render(this.scene, this.camera);
+    const render = () => {
+      requestAnimationFrame(render);
+      this.stats.begin();
+      this.animate();
+      this.renderer.render(this.scene, this.camera);
+      this.stats.end();
+    };
+    render();
   }
 }
