@@ -1,6 +1,6 @@
 import { WebGLRenderer, AxesHelper, PerspectiveCamera, Scene } from 'three';
 import Stats from 'stats.js';
-import Utils from './utils';
+import MouseControl from './utils/mouse-control';
 
 export default class Renderer {
   /**
@@ -32,10 +32,9 @@ export default class Renderer {
     this.camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     this.camera.position.set(20, 30, 40);
     this.camera.lookAt(this.scene.position);
-    Utils.mouseControl(this.camera, this.container, this.scene.position, {
-      x: Math.PI, y: Math.PI
-    });
-    // Utils.mouseControl(this.scene, this.camera, this.container, 2);
+    this.mouseControl = new MouseControl(this.camera, this.container, this.scene.position);
+    // this.mouseControl.cordinationMappingMode();
+    this.mouseControl.offsetAppendMode(1);
   }
 
   onResize() {
@@ -74,6 +73,7 @@ export default class Renderer {
     const render = () => {
       requestAnimationFrame(render);
       this.stats.begin();
+      this.mouseControl.update();
       this.animate();
       this.renderer.render(this.scene, this.camera);
       this.stats.end();
