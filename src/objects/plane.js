@@ -2,8 +2,8 @@ import { PlaneBufferGeometry, MeshBasicMaterial, Mesh } from 'three';
 import Geometry from './geometry';
 
 export default class Plane extends Geometry {
-  constructor() {
-    super();
+  constructor(name) {
+    super(name);
     this.gemoetry = new PlaneBufferGeometry(100, 100, 1, 1);
     this.material = new MeshBasicMaterial({ color: '#0288d1' });
     this.instance = new Mesh(this.gemoetry, this.material);

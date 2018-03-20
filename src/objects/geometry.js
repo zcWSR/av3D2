@@ -1,13 +1,13 @@
+import { v1 } from 'uuid';
+
 export default class Geometry {
-  constructor() {
+  constructor(name) {
+    if (name) this.name = name;
+    else this.name = v1();
     this.animate = () => {};
   }
 
   doAnimate() {
-    this.animate(this);
-  }
-
-  get uuid() {
-    return this.instance.uuid;
+    this.animate(this.instance);
   }
 }
