@@ -1,6 +1,6 @@
 import { WebGLRenderer, AxesHelper, PerspectiveCamera, Scene } from 'three';
 import Stats from 'stats.js';
-import { v1 } from 'uuid';
+import Utils from './utils';
 
 export default class Renderer {
   /**
@@ -30,10 +30,12 @@ export default class Renderer {
     this.scene = new Scene();
 
     this.camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.x = 20;
-    this.camera.position.y = 30;
-    this.camera.position.z = 40;
+    this.camera.position.set(20, 30, 40);
     this.camera.lookAt(this.scene.position);
+    Utils.mouseControl(this.camera, this.container, this.scene.position, {
+      x: Math.PI, y: Math.PI
+    });
+    // Utils.mouseControl(this.scene, this.camera, this.container, 2);
   }
 
   onResize() {
@@ -41,36 +43,34 @@ export default class Renderer {
   }
 
   add(object) {
-    if (object.name) {
-      this.objectMap[object.name] = object;
-      this.scene.add(object.instance);
-      return null;
+    this.objectMap[object.uuid] = object;
+    this.objectKeys = Object.keys(this.objectMap);
+    this.scene.add(object.instance);
+    return object.uuid;
+  }
+
+  getObjectById(uuid) {
+    let object = this.objectMap[uuid];
+    if (!object) {
+      object = this.scene.getObjectById(uuid);
     }
-    const name = v1();
-    this.objectMap[name] = object;
-    this.scene.add(object);
-    return name;
+    return object;
   }
 
-  getObject(name) {
-    return this.objectMap[name];
-  }
-
-  removeObject(name) {
-    delete this.objectMap[name];
+  removeObject(object) {
+    delete this.objectMap[object.uuid];
+    this.objectKeys = Object.keys(this.objectMap);
+    this.scene.remove(object.instance || object);
   }
 
   animate() {
-    // for(let name in this.objectMap) {
-    //   this.objectMap[name].doAnimate();
-    // }
-    const keys = Object.keys(this.objectMap);
-    for (let i = 0; i < keys.length; i++) {
-      this.objectMap[keys[i]].doAnimate();
+    for (let i = 0; i < this.objectKeys.length; i++) {
+      const o = this.objectMap[this.objectKeys[i]];
+      if (o.doAnimate) o.doAnimate();
     }
   }
 
-  go() {
+  start() {
     const render = () => {
       requestAnimationFrame(render);
       this.stats.begin();

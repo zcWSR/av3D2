@@ -11,9 +11,13 @@ const plane = new Plane();
 
 renderer.add(plane);
 renderer.add(simpleCube);
-simpleCube.animate = (instance) => {
-  instance.rotation.x += Math.PI / 100;
-  instance.rotation.y += Math.PI / 100;
+simpleCube.animate = (object) => {
+  object.instance.rotation.x += Math.PI / 100;
+  object.instance.rotation.y += Math.PI / 100;
 };
 
-renderer.go();
+renderer.start();
+
+// setTimeout(() => {
+//   renderer.removeObject(simpleCube);
+// }, 5000);
