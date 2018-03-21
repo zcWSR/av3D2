@@ -18,7 +18,7 @@ export default class Renderer {
   initRenderer() {
     this.renderer = new WebGLRenderer({ antialias: true });
     // this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
     this.container.appendChild(this.renderer.domElement);
     // this.renderer.setClearColor(0xFFFFFF, 1.0);
     window.addEventListener('resize', () => this.onResize());
@@ -29,7 +29,12 @@ export default class Renderer {
   initSceneAndCamera() {
     this.scene = new Scene();
 
-    this.camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.camera = new PerspectiveCamera(
+      45,
+      this.container.clientWidth / this.container.clientHeight,
+      0.1,
+      1000
+    );
     this.camera.position.set(20, 30, 40);
     this.camera.lookAt(this.scene.position);
     this.mouseControl = new MouseControl(this.camera, this.container, this.scene.position);
@@ -38,7 +43,9 @@ export default class Renderer {
   }
 
   onResize() {
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
   }
 
   add(object) {
