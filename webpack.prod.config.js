@@ -2,11 +2,12 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = {
   entry: {
-    index: './src/index.js',
-    vendor: ['three']
+    index: './src/index.js'
+    // vendor: ['three']
   },
   output: {
     path: path.resolve(__dirname, 'build'),
@@ -39,12 +40,17 @@ module.exports = {
     }),
     new webpack.optimize.CommonsChunkPlugin({
       names: ['vendor'], // manifest：不再重复打包vendor.js影响速度
-      minChunks: Infinity,
+      minChunks: ({ resource }) => (
+        resource &&
+        resource.indexOf('node_modules') >= 0 &&
+        resource.match(/\.js$/)
+      ),
       filename: '[name].[hash].js'
     }),
     new ExtractTextPlugin('style.[hash].css'),
     new HtmlWebpackPlugin({
       template: './src/index.html'
-    })
+    }),
+    new BundleAnalyzerPlugin()
   ]
 };
